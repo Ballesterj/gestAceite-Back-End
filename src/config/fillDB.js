@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+require('dotenv').config({ path: `${__dirname}/env/.env` });
 const Cooperativa = require('../services/db/models/cooperativa');
 const Socio = require('../services/db/models/socio');
 const Finca = require('../services/db/models/finca');
@@ -22,11 +24,12 @@ const createData = async () => {
     const names = ['Juan', 'Pedro', 'María', 'Ana', 'Luis'];
     const socios = [];
     for (let i = 1; i <= 5; i++) {
-      const hashPassword = "example";
+      const password = "example";
+      const hashPassword = await bcrypt.hash(password, 10);
       const socio = await Socio.create({
         name: `${names[i - 1]}`,
-        email: `${names[i - 1]}@example.com`,
-        hashPassword,
+        email: `${names[i - 1]}@example.com`.toLowerCase(),
+        password: hashPassword,
         cooperativa: cooperativas[Math.floor(Math.random() * 2)]._id,
         phone: `60000000${i}`
       });

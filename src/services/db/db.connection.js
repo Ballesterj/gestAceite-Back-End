@@ -1,7 +1,5 @@
 const { mongoose } = require('mongoose');
-
-const url = 'mongodb://localhost:27017';
-const dbName = '/gestAceite';
+require('dotenv').config({ path: `${__dirname}/env/.env` });
 let dbConnection = null;
 // Models
 require('../db/models/socio');
@@ -19,7 +17,7 @@ async function connectDB() {
 
   try {
 
-    await mongoose.connect(url+dbName, {});
+    await mongoose.connect(process.env.DATABASE_URL, {});
     dbConnection = mongoose.connection;
 
     return dbConnection;

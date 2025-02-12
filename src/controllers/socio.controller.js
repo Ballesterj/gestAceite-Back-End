@@ -1,14 +1,44 @@
 const db = require('../services/db');
+const bcrypt = require('bcrypt');
+const { dataEncode } = require('../helpers/jwt.helper');
+require('dotenv').config({ path: `${__dirname}/env/.env` });
+
+
+async function login(req, res) {
+    const { email, password } = req.body;
+  
+    try {
+        const user = await db.Socio.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ message: 'Socio not found' });
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Incorrect password' });
+      }
+  
+      const token = dataEncode({ id: user.id, email: user.email });
+      res.status(200).json({ message: 'Login successful', token });
+  
+    } catch (error) {
+      res.status(500).json({ message: 'Login error', error: error.message });
+    }
+  }
 
 async function getMe(req, res) {
     try {
-        const socio = await  db.Socio;findById(req.user.id);
+        const socio = await  db.Socio.findById(req.user.id);
 
         if (!socio) {
             return res.status(404).json({ message: 'Socio no encontrado' });
         }
         
-        res.status(200).json(socio);
+        const socioResponse = socio.toObject();
+        delete socioResponse.password;
+        res.status(200).json(socioResponse);
+
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -16,40 +46,47 @@ async function getMe(req, res) {
 
 async function createSocio(req, res) {
     try {
-        const {
-            name,
-            email,
-            password,
-            rol,
-            cooperativa,
-            phone,
-            mensajes_leidos
-        } = req.body;
+        const { name, email, password, rol, cooperativa, phone, mensajes_leidos } = req.body;
 
-        const socio = new db.Socio({
+        const userExists = await db.Socio.findOne({ email });        
+        if (userExists) {
+            return res.status(400).json({ message: 'The user already exists' });
+        }
+
+        if (rol === "admin") {
+            const adminExists = await db.Socio.findOne({ cooperativa, rol: "admin" });
+            if (adminExists) {
+                return res.status(400).json({ message: 'An administrator already exists for this cooperative' });
+            }
+        }
+
+        const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
+        const hashPassword = await bcrypt.hash(password, saltRounds);
+        
+        const socio = await db.Socio.create({
             name,
             email,
-            password,
+            password: hashPassword,
             rol,
             cooperativa,
             phone,
             mensajes_leidos
         });
 
-        if (!socio) {
-            return res.status(400).json({ message: 'No se pudo crear el socio' });
-        }
-
-        res.status(201).json(socio);
+        const socioResponse = socio.toObject();
+        delete socioResponse.password;
+        res.status(201).json(socioResponse);   
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 }
 
+
+
 async function updateSocio(req, res) {
     try {
-        const socio = await db.Socio.findById(req.user.id); //HACER AQUÍ UN FIND UPDATE
-
+        const { userId } = req.params;
+        const socio = await db.Socio.findOne(userId);
         if (!socio) {
             return res.status(404).json({ message: 'Socio no encontrado' });
         }
@@ -61,20 +98,35 @@ async function updateSocio(req, res) {
             rol,
             cooperativa,
             phone,
-            mensajes_leidos
         } = req.body;
 
-        socio.name = name;
-        socio.email = email;
-        socio.password = password;
-        socio.rol = rol;
-        socio.cooperativa = cooperativa;
-        socio.phone = phone;
-        socio.mensajes_leidos = mensajes_leidos;
+        let hashPassword = socio.password;
 
-        await socio.save();
+        if (password) {
+            const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
+            hashPassword = await bcrypt.hash(password, saltRounds);
+        }
 
-        res.status(200).json(socio);
+        const updateFields = {
+            name: name || socio.name,
+            email: email || socio.email,
+            password: hashPassword || socio.password,
+            rol: rol || socio.rol,
+            cooperativa: cooperativa || socio.cooperativa,
+            phone: phone || socio.phone,
+        }
+
+       const updatedSocio = await db.Socio.findOneAndUpdate(
+        { id: userId}, 
+        updateFields, 
+        { new: true, runValidators: true, lean: true },
+       );
+
+       if(!updatedSocio) {
+            return res.status(400).json({ message: 'Error updating user' });
+       }
+
+        res.status(200).json(updatedSocio);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -131,4 +183,5 @@ module.exports = {
     deleteSocio,
     getSocios,
     getReadsMessages,
+    login,
 };

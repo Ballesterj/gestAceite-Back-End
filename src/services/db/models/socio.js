@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 const SocioSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  hashPassword: { type: String, required: true },
+  password: { type: String, required: true },
   rol: {
     type: String,
     enum: ['admin', 'agricultor'], 
@@ -22,5 +22,6 @@ const SocioSchema = new Schema({
     ref: 'Mensaje' 
   }]
 });
+
 
 module.exports = mongoose.model('Socio', SocioSchema);

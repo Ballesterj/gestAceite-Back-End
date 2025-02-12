@@ -31,6 +31,8 @@ async function createGanancia(req, res) {
             date,
             concept,
             finca,
+            kilos,
+            degrees,
         } = req.body;
 
         const ganancia = new db.Ganancia({
@@ -38,6 +40,8 @@ async function createGanancia(req, res) {
             date,
             concept,
             finca,
+            kilos,
+            degrees,
         });
         if (!ganancia) {
             return res.status(404).json({ error: 'Ganancia not created' });
@@ -59,11 +63,15 @@ async function updateGanancia(req, res) {
             date,
             concept,
             finca,
+            kilos,
+            degrees,
         } = req.body;
         ganancia.amount = amount;
         ganancia.date = date;
         ganancia.finca = finca;
         ganancia.concept = concept;
+        ganancia.kilos = kilos;
+        ganancia.degrees = degrees;
         await ganancia.save();
         res.status(200).json(ganancia);
     } catch (error) {
