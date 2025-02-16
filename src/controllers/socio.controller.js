@@ -81,8 +81,6 @@ async function createSocio(req, res) {
     }
 }
 
-
-
 async function updateSocio(req, res) {
     try {
         const { userId } = req.params;

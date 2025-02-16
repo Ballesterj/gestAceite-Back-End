@@ -6,8 +6,9 @@ const JoiEntityId =
         .length(24)
         .required()
         .messages({
-            'string.hex': 'El ID de socio debe contener solo caracteres hexadecimales.',
-            'string.length': 'El ID de socio debe tener exactamente 24 caracteres.',
+           'string.hex': 'The ID must contain only hexadecimal characters.',
+            'string.length': 'The ID must be exactly 24 characters long.',
+            'any.required': 'The ID field is required.',
         });
 
         

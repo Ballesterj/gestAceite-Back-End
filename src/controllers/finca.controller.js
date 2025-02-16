@@ -1,8 +1,9 @@
 const db = require('../services/db');
+const mongoose = require('mongoose');
 
 async function getFinca(req, res) {
     try {
-        const finca = await db.Finca.findByPk(req.params.id);
+        const finca = await db.Finca.findById(req.params.id);
         if (!finca) {
             return res.status(404).json({ error: 'Finca not found' });
         }
@@ -14,7 +15,7 @@ async function getFinca(req, res) {
 
 async function getFincas(req, res) {
     try {
-        const fincas = await db.Finca.findAll();
+        const fincas = await db.Finca.find();
         if (!fincas) {
             return res.status(404).json({ error: 'Fincas not found' });
         }
@@ -31,10 +32,10 @@ async function createFinca(req, res) {
             location,
             surface,
             oliveAmount,
-            owner,
         } = req.body;
+        const owner = new mongoose.Types.ObjectId(req.user.id);
 
-        const finca = new db.Finca({
+        const finca =await db.Finca.create({
             name,
             location,
             surface,
@@ -52,37 +53,57 @@ async function createFinca(req, res) {
 
 async function updateFinca(req, res) {
     try {
-        const finca = await db.Finca.findByPk(req.params.id);
+        const { fincaId } = req.params;
+        const finca = await db.Finca.findOne(fincaId);
+
         if (!finca) {
-            return res.status(404).json({ error: 'Finca not found' });
+            return res.status(404).json({ message: 'Finca not found' });
         }
-        const {
-            name,
-            location,
-            surface,
-            oliveAmount,
-            owner,
-        } = req.body;
-        finca.name = name;
-        finca.location = location;
-        finca.surface = surface;
-        finca.oliveAmount = oliveAmount;
-        finca.owner = owner;
-        await finca.save();
-        res.status(200).json(finca);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        const ownerF = finca.owner.toString();
+        if( ownerF !== req.user.id) {
+            return res.status(403).json({ message: 'You are not authorized to update this finca' });
+        }
+
+        const { name, location, surface, oliveAmount, owner } = req.body;
+
+        const updateFields = {
+            name: name || finca.name,
+            location: location || finca.location,
+            surface: surface || finca.surface,
+            oliveAmount: oliveAmount || finca.oliveAmount,
+            owner: owner || finca.owner,
+        };
+
+        const updatedFinca = await db.Finca.findOneAndUpdate(
+            fincaId,
+            updateFields,
+            { new: true, runValidators: true, lean: true }
+        );
+
+        if (!updatedFinca) {
+            return res.status(400).json({ message: 'Error updating finca' });
+        }
+
+        res.status(200).json(updatedFinca);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 }
 
 async function deleteFinca(req, res) {
     try {
-        const finca = await db.Finca.findByPk(req.params.id);
+        const fincaId = req.params;
+        const finca = await db.Finca.findById(fincaId.id);
         if (!finca) {
             return res.status(404).json({ error: 'Finca not found' });
         }
-        await finca.destroy();
-        res.status(204).json();
+        if (finca.owner.toJSON() !== req.user.id) {
+            return res.status(403).json({ error: 'You are not authorized to delete this finca' });
+        }
+        const fincaDeleted = finca;
+        console.log(fincaDeleted);
+        await finca.deleteOne();
+        res.status(200).json(fincaDeleted);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -90,19 +111,17 @@ async function deleteFinca(req, res) {
 
 async function getFincasSocio(req, res) {
     try {
-        const fincas = await db.Finca.findAll({
-            where: {
-                owner: req.params.id,
-            },
-        });
-        if (!fincas) {
-            return res.status(404).json({ error: 'No Fincas found' });
+        const fincas = await db.Finca.find({ owner: req.params.id });
+
+        if (!fincas || fincas.length === 0) {
+            return res.status(404).json({ error: 'No fincas found for this Socio' });
         }
         res.status(200).json(fincas);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
+
 
 module.exports = {
     getFinca,
