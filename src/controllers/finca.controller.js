@@ -101,7 +101,6 @@ async function deleteFinca(req, res) {
             return res.status(403).json({ error: 'You are not authorized to delete this finca' });
         }
         const fincaDeleted = finca;
-        console.log(fincaDeleted);
         await finca.deleteOne();
         res.status(200).json(fincaDeleted);
     } catch (error) {
