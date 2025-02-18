@@ -1,5 +1,4 @@
 const Joi = require('joi');
-const { JoiEntityId } = require('../helpers/joiValidators');
 
 const validatePostFinca = Joi.object({
     name: Joi.string().min(3).max(50).required().messages({

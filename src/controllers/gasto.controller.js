@@ -1,8 +1,10 @@
 const db = require('../services/db');
+const mongoose = require('mongoose');
+const finca = require('../services/db/models/finca');
 
 async function getGasto(req, res) {
     try {
-        const gasto = await db.Gasto.findByPk(req.params.id);
+        const gasto = await db.Gasto.findById(req.params.id);
         if (!gasto) {
             return res.status(404).json({ error: 'Gasto not found' });
         }
@@ -14,9 +16,9 @@ async function getGasto(req, res) {
 
 async function getGastos(req, res) {
     try {
-        const gastos = await db.Gasto.findAll();
+        const gastos = await db.Gasto.find();
         if (!gastos) {
-            return res.status(404).json({ error: 'Gastos not found' });
+            return res.status(404).json({ error: 'No gastos found' });
         }
         res.status(200).json(gastos);
     } catch (error) {
@@ -26,21 +28,18 @@ async function getGastos(req, res) {
 
 async function createGasto(req, res) {
     try {
-        const {
-            amount,
-            date,
-            concept,
-            finca,
-        } = req.body;
+        const { amount, date, concept, finca } = req.body;
+        const fincaId = new mongoose.Types.ObjectId(finca);
 
-        const gasto = new db.Gasto({
+        const gasto = await db.Gasto.create({
             amount,
             date,
             concept,
-            finca,
+            finca: fincaId,
         });
+
         if (!gasto) {
-            return res.status(404).json({ error: 'Gasto not created' });
+            return res.status(400).json({ error: 'Gasto not created' });
         }
         res.status(201).json(gasto);
     } catch (error) {
@@ -50,24 +49,33 @@ async function createGasto(req, res) {
 
 async function updateGasto(req, res) {
     try {
-        const gasto = await db.Gasto.findByPk(req.params.id);
+        const { id } = req.params;
+        const gasto = await db.Gasto.findById(id);
+
         if (!gasto) {
             return res.status(404).json({ error: 'Gasto not found' });
         }
-        const {
-            amount,
-            date,
-            concept,
-            finca,
-        } = req.body;
 
-        gasto.amount = amount;
-        gasto.date = date;
-        gasto.concept = concept;
-        gasto.finca = finca;
+        const { amount, date, concept, finca } = req.body;
 
-        await gasto.save();
-        res.status(200).json(gasto);
+        const updateFields = {
+            amount: amount || gasto.amount,
+            date: date || gasto.date,
+            concept: concept || gasto.concept,
+            finca: finca || gasto.finca,
+        };
+
+        const updatedGasto = await db.Gasto.findByIdAndUpdate(
+            id,
+            updateFields,
+            { new: true, runValidators: true, lean: true }
+        );
+
+        if (!updatedGasto) {
+            return res.status(400).json({ error: 'Gasto not updated' });
+        }
+
+        res.status(200).json(updatedGasto);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -75,12 +83,15 @@ async function updateGasto(req, res) {
 
 async function deleteGasto(req, res) {
     try {
-        const gasto = await db.Gasto.findByPk(req.params.id);
+        const { id } = req.params;
+        const gasto = await db.Gasto.findById(id);
+
         if (!gasto) {
             return res.status(404).json({ error: 'Gasto not found' });
         }
-        await gasto.destroy();
-        res.status(204).json();
+        const deletedGasto = gasto;
+        await gasto.deleteOne();
+        res.status(200).json(deletedGasto);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -88,14 +99,12 @@ async function deleteGasto(req, res) {
 
 async function getGastosByFinca(req, res) {
     try {
-        const gastos = await db.Gasto.findAll({
-            where: {
-                finca: req.params.fincaId
-            }
-        });
-        if (!gastos) {
-            return res.status(404).json({ error: 'Gastos not found' });
+        const { fincaId } = req.params.id;
+        const gastos = await db.Gasto.find(fincaId);
+        if (!gastos || gastos.length === 0) {
+            return res.status(404).json({ error: 'No gastos found for this Finca' });
         }
+
         res.status(200).json(gastos);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -108,5 +117,5 @@ module.exports = {
     createGasto,
     updateGasto,
     deleteGasto,
-    getGastosByFinca
+    getGastosByFinca,
 };

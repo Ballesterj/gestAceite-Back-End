@@ -121,7 +121,6 @@ async function getFincasSocio(req, res) {
     }
 }
 
-
 module.exports = {
     getFinca,
     getFincas,

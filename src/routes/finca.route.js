@@ -11,7 +11,7 @@ const { auth } = require('../middlewares/auth');
 const { validateId } = require('../middlewares/validateId');
 const { validateNewFinca, validateUpdateFinca } = require('../middlewares/validateFinca');
 
-router.post('/', auth, createFinca);
+router.post('/', auth, validateNewFinca, createFinca);
 router.patch('/:id', auth, validateId, validateUpdateFinca, updateFinca);
 router.delete('/:id', auth, validateId, deleteFinca);
 router.get('/', getFincas);

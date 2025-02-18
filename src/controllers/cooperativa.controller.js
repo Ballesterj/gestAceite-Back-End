@@ -74,7 +74,7 @@ async function updateCooperativa(req, res) {
             email: email || cooperativa.email,
         };
         
-        const updatedCooperativa = await cooperativa.findOneAndUpdate(
+        const updatedCooperativa = await db.Cooperativa.findOneAndUpdate(
             cooperativaId,
             updateFields,
             { new: true }, { runValidators: true }, { lean: true }
@@ -106,9 +106,23 @@ async function deleteCooperativa(req, res) {
     }
 }
 
+/**
+ * @brief Retrieves socios (members) of a cooperativa (cooperative) by its ID.
+ * 
+ * This asynchronous function fetches socios associated with a specific cooperativa
+ * from the database. If no socios are found, it returns a 404 status with an error message.
+ * In case of any other errors, it returns a 500 status with the error message.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} req.params - The parameters of the request.
+ * @param {string} req.params.id - The ID of the cooperativa.
+ * @param {Object} res - The response object.
+ * 
+ * @returns {Promise<void>} A promise that resolves to void.
+ */
 async function getSocios(req, res) {
     try {
-        const socios = await db.Socio.findAll({ cooperativa: req.params.id });
+        const socios = await db.Socio.find({ cooperativa: req.params.id });
         if (!socios.length) {
             return res.status(404).json({ error: 'Socios not found' });
         }

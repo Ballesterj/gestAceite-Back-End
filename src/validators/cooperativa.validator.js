@@ -1,55 +1,81 @@
 const Joi = require('joi');
-const JoiEntityId = require('./joiValidators');
 
 const validatePostCooperativa = Joi.object({
-        name: Joi.string()
+    name: Joi.string()
         .min(3)
         .max(50)
         .required()
         .messages({
-            'string.min': 'El nombre debe tener al menos 3 caracteres.',
-            'string.max': 'El nombre debe tener como máximo 50 caracteres.',
-            'any.required': 'El nombre es obligatorio.',
+            'string.min': 'The name must be at least 3 characters long.',
+            'string.max': 'The name must be at most 50 characters long.',
+            'any.required': 'The name is required.',
         }),
-        email: Joi.string()
+    direction: Joi.string()
+        .min(3)
+        .max(50)
+        .required()
+        .messages({
+            'string.min': 'The address must be at least 3 characters long.',
+            'string.max': 'The address must be at most 50 characters long.',
+            'any.required': 'The address is required.',
+        }),
+    city: Joi.string()
+        .min(3)
+        .max(50)
+        .required()
+        .messages({
+            'string.min': 'The city must be at least 3 characters long.',
+            'string.max': 'The city must be at most 50 characters long.',
+            'any.required': 'The city is required.',
+        }),
+    email: Joi.string()
         .email()
         .required()
         .messages({
-            'string.email': 'El email debe ser un email válido.',
-            'any.required': 'El email es obligatorio.',
+            'string.email': 'The email must be a valid email address.',
+            'any.required': 'The email is required.',
         }),
-        phone: Joi.string()
+    phone: Joi.string()
         .pattern(/^\d{9}$/)
         .required()
         .messages({
-            'string.pattern.base': 'El teléfono debe contener exactamente 9 dígitos numéricos.',
-            'any.required': 'El teléfono es obligatorio.',
+            'string.pattern.base': 'The phone number must contain exactly 9 numeric digits.',
+            'any.required': 'The phone number is required.',
         }),
-    });
+});
 
 const validatePutCooperativa = Joi.object({
     name: Joi.string()
-    .min(3)
-    .max(50)
-    .required()
-    .messages({
-        'string.min': 'El nombre debe tener al menos 3 caracteres.',
-        'string.max': 'El nombre debe tener como máximo 50 caracteres.',
-        'any.required': 'El nombre es obligatorio.',
-    }),
+        .min(3)
+        .max(50)
+        .messages({
+            'string.min': 'The name must be at least 3 characters long.',
+            'string.max': 'The name must be at most 50 characters long.',
+        }),
+    direction: Joi.string()
+        .min(3)
+        .max(50)
+        .messages({
+            'string.min': 'The address must be at least 3 characters long.',
+            'string.max': 'The address must be at most 50 characters long.',
+        }),
+    city: Joi.string()
+        .min(3)
+        .max(50)
+        .messages({
+            'string.min': 'The city must be at least 3 characters long.',
+            'string.max': 'The city must be at most 50 characters long.',
+        }),
     email: Joi.string()
-    .email()
-    .required()
-    .messages({
-        'string.email': 'El email debe ser un email válido.',
-        'any.required': 'El email es obligatorio.',
-    }),
+        .email()
+        .messages({
+            'string.email': 'The email must be a valid email address.',
+        }),
     phone: Joi.string()
-    .pattern(/^\d{9}$/)
-    .messages({
-        'string.pattern.base': 'El teléfono debe contener exactamente 9 dígitos numéricos.',
-        'any.required': 'El teléfono es obligatorio.',
-    }),
+        .pattern(/^\d{9}$/)
+        .messages({
+            'string.pattern.base': 'The phone number must contain exactly 9 numeric digits.',
+        }),
 });
 
 module.exports = {

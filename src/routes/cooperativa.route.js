@@ -17,7 +17,7 @@ router.post('/', auth, validateNewCooperativa, createCooperativa);
 router.patch('/:id', auth, validateId, validateUpdateCooperativa, updateCooperativa);
 router.delete('/:id', auth, validateId, deleteCooperativa);
 router.get('/', auth, getCoopertivas);
-router.get('/socios', auth, getSocios);
-router.get('/me', auth, getCoopertiva);
+router.get('/:id/socios', validateId, auth, getSocios);
+router.get('/:id', auth, getCoopertiva);
 
 module.exports = router;
