@@ -15,7 +15,7 @@ router.post('/', auth, validateNewFinca, createFinca);
 router.patch('/:id', auth, validateId, validateUpdateFinca, updateFinca);
 router.delete('/:id', auth, validateId, deleteFinca);
 router.get('/', getFincas);
+router.get('/socio', auth, getFincasSocio);
 router.get('/:id', auth, validateId, getFinca);
-router.get('/socio/:id', auth, validateId, getFincasSocio);
 
 module.exports = router;

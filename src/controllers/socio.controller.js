@@ -34,9 +34,13 @@ async function getMe(req, res) {
         if (!socio) {
             return res.status(404).json({ message: 'Socio no encontrado' });
         }
+
+        
         
         const socioResponse = socio.toObject();
         delete socioResponse.password;
+        const cooperativa = await db.Cooperativa.findById(socio.cooperativa);
+        socioResponse.cooperativa = cooperativa ? cooperativa.name : null;
         res.status(200).json(socioResponse);
 
     } catch (err) {
