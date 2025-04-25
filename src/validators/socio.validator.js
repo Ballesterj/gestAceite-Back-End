@@ -77,6 +77,7 @@ const validateUpSocio = Joi.object({
                 'string.pattern.base': 'The phone number must contain exactly 9 numeric digits.',
                 'string.empty': 'The phone field cannot be empty.',
             }),
+        cooperativa: Joi.string(),
     });
 
 module.exports = {

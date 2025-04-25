@@ -15,10 +15,12 @@ async function getMensaje(req, res) {
 
 async function getMensajes(req, res) {
     try {
-        const mensajes = await db.Mensaje.find();
-        if (!mensajes) {
-            return res.status(404).json({ error: 'Mensajes not found' });
+        const socio = await db.Socio.findById(req.user.id);
+        if (!socio) {
+            return res.status(404).json({ message: 'Socio no encontrado' });
         }
+        // Buscar mensajes que correspondan a la cooperativa del socio
+        const mensajes = await db.Mensaje.find({ cooperativa: socio.cooperativa });
         res.status(200).json(mensajes);
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -18,14 +18,16 @@ async function getAceitePrecios(req, res) {
   try {
     const precioUrl = 'https://www.asajajaen.com/precio-del-aceite';
     const { data: precioData } = await axios.get(precioUrl);
-    const $precio = cheerio.load(precioData);
+    
+    // Aquí cambiamos el nombre de '$' a 'dom' o cualquier otro nombre
+    const dom = cheerio.load(precioData); 
 
     const filas = [];
-    $('tbody').each((i, el) => {
+    dom('tbody').each((i, el) => {
       const fila = [];
-      $(el).find('tr').each((j, tr) => {
-        $(tr).find('td').each((k, td) => {
-          fila.push($(td).text().trim());
+      dom(el).find('tr').each((j, tr) => {
+        dom(tr).find('td').each((k, td) => {
+          fila.push(dom(td).text().trim());
         });
       });
       filas.push(fila);
@@ -45,6 +47,7 @@ async function getAceitePrecios(req, res) {
     const primerVirgenExtra = virgenExtraData[0] || null;
     res.json(primerVirgenExtra);
   } catch (error) {
+    console.error('Error al hacer scraping:', error);
     res.status(500).json({ error: 'Error al hacer scraping' });
   }
 }
@@ -59,18 +62,17 @@ async function getAceiteNoticias(req, res) {
     const noticias = [];
     $('.recent-post.clearfix').each((i, el) => {
       if (i < 4) {
-        const titulo = $(el).find('h2 a').text().trim();
-        const enlace = $(el).find('h2 a').attr('href');
-        const imagen = $(el).find('img').attr('src');
-        
-        const descripcionHtml = $(el).find('.et-description p').eq(1).html();
-        const descripcionTexto = descripcionHtml.replace(/.*<\/a>\s*(.*?)\s*\.\n.*/s, '$1').trim();
+        const enlaceParcial = $(el).find('h2 a').attr('href');
+        const enlace = `https://www.asajajaen.com${enlaceParcial}`;
+        const descripcion = $(el).find('h2 a').text().trim();
+        const imagen = $(el).find('img').attr('src') || null;
+        const titulo = descripcion; // si querés usar el mismo texto como título también
 
         noticias.push({
           titulo,
-          enlace: `https://www.asajajaen.com${enlace}`,
-          imagen,
-          descripcion: descripcionTexto
+          descripcion,
+          enlace,
+          imagen
         });
       }
     });
@@ -80,6 +82,8 @@ async function getAceiteNoticias(req, res) {
     res.status(500).json({ error: 'Error al hacer scraping' });
   }
 }
+
+
 
 module.exports = {
     getMainPage,

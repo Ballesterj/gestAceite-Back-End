@@ -87,8 +87,9 @@ async function createSocio(req, res) {
 
 async function updateSocio(req, res) {
     try {
-        const { userId } = req.params;
-        const socio = await db.Socio.findOne(userId);
+        const { id } = req.params;
+        console.log(id);
+        const socio = await db.Socio.findById(id);
         if (!socio) {
             return res.status(404).json({ message: 'Socio no encontrado' });
         }
@@ -119,7 +120,7 @@ async function updateSocio(req, res) {
         }
 
        const updatedSocio = await db.Socio.findOneAndUpdate(
-        { id: userId}, 
+        { _id: id}, 
         updateFields, 
         { new: true, runValidators: true, lean: true },
        );
