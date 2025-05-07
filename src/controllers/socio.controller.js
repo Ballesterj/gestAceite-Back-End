@@ -88,7 +88,6 @@ async function createSocio(req, res) {
 async function updateSocio(req, res) {
     try {
         const { id } = req.params;
-        console.log(id);
         const socio = await db.Socio.findById(id);
         if (!socio) {
             return res.status(404).json({ message: 'Socio no encontrado' });
@@ -179,6 +178,32 @@ async function getReadsMessages(req, res) {
     }   
 }
 
+async function putPresident(req, res) {
+    try {
+        const { id } = req.params;
+        const socio = await db.Socio.findById(id);
+        if (!socio) {
+            return res.status(404).json({ message: 'Socio no encontrado' });
+        }
+
+        const presidentExists = await db.Socio.findOne({ 
+            president: true,
+            cooperativa: socio.cooperativa,
+        });
+
+        if (presidentExists) {
+            return res.status(400).json({ message: 'Ya existe un presidente para esta cooperativa' });
+        }
+
+        socio.president = true;
+        const updatedSocio = await socio.save();
+
+        res.status(200).json(updatedSocio);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
 module.exports = {
     getMe,
     createSocio,
@@ -187,4 +212,5 @@ module.exports = {
     getSocios,
     getReadsMessages,
     login,
+    putPresident,
 };

@@ -20,7 +20,8 @@ const SocioSchema = new Schema({
   mensajes_leidos: [{ 
     type: Schema.Types.ObjectId, 
     ref: 'Mensaje' 
-  }]
+  }],
+  president: { type: Boolean, default: false },
 });
 
 
