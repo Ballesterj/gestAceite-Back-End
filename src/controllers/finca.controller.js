@@ -35,6 +35,7 @@ async function createFinca(req, res) {
             location,
             surface,
             oliveAmount,
+            harvests,
         } = req.body;
         const owner = req.user.id;
 
@@ -44,8 +45,8 @@ async function createFinca(req, res) {
             surface,
             oliveAmount,
             owner,
+            harvests,
         });
-        console.log('finca', finca.owner);
         if (!finca) {
             return res.status(404).json({ error: 'Finca not created' });
         }
@@ -57,46 +58,62 @@ async function createFinca(req, res) {
 
 async function updateFinca(req, res) {
     try {
-        let { id } = req.params;
-        id = new ObjectId(id)
-        const finca = await db.Finca.findOne(id);
-
-        if (!finca) {
-            return res.status(404).json({ message: 'Finca not found' });
-        }
-        const ownerF = finca.owner;
-        const userId = new ObjectId(req.user.id);
-
-        if (!ownerF.equals(userId)) {
-            return res.status(403).json({ message: 'You are not authorized to update this finca' });
-        }
-        
-
-        const { name, location, surface, oliveAmount, owner } = req.body;
-
-        const updateFields = {
-            name: name || finca.name,
-            location: location || finca.location,
-            surface: surface || finca.surface,
-            oliveAmount: oliveAmount || finca.oliveAmount,
-            owner: owner || finca.owner,
-        };
-
-        const updatedFinca = await db.Finca.findOneAndUpdate(
-            id,
-            updateFields,
-            { new: true, runValidators: true, lean: true }
-        );
-
-        if (!updatedFinca) {
-            return res.status(400).json({ message: 'Error updating finca' });
-        }
-
-        res.status(200).json(updatedFinca);
+      let { id } = req.params;
+      id = new ObjectId(id); // Asegurarnos de que el id sea de tipo ObjectId
+      const finca = await db.Finca.findOne(id);
+  
+      if (!finca) {
+        return res.status(404).json({ message: 'Finca not found' });
+      }
+  
+      const ownerF = finca.owner;
+      const userId = new ObjectId(req.user.id);
+  
+      if (!ownerF.equals(userId)) {
+        return res.status(403).json({ message: 'You are not authorized to update this finca' });
+      }
+  
+      // Extraemos los campos enviados en la solicitud
+      const { name, location, surface, oliveAmount, owner, harvests } = req.body;
+  
+      // Preparamos los campos a actualizar
+      const updateFields = {
+        name: name || finca.name,
+        location: location || finca.location,
+        surface: surface || finca.surface,
+        oliveAmount: oliveAmount || finca.oliveAmount,
+        owner: owner || finca.owner,
+      };
+  
+      // Si se han proporcionado cosechas en el cuerpo de la solicitud
+      if (harvests) {
+        // Excluimos el campo _id de cada cosecha, ya que MongoDB lo gestiona automáticamente
+        const updatedHarvests = harvests.map(harvest => {
+          const { _id, ...resto } = harvest; // Excluimos el _id
+          return resto;
+        });
+  
+        updateFields.harvests = updatedHarvests; // Asignamos las cosechas actualizadas al objeto de actualización
+      }
+  
+      // Realizamos la actualización en la base de datos
+      const updatedFinca = await db.Finca.findOneAndUpdate(
+        id,
+        updateFields,
+        { new: true, runValidators: true, lean: true }
+      );
+  
+      if (!updatedFinca) {
+        return res.status(400).json({ message: 'Error updating finca' });
+      }
+  
+      // Respondemos con la finca actualizada
+      res.status(200).json(updatedFinca);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+      res.status(500).json({ message: err.message });
     }
-}
+  }
+  
 
 async function deleteFinca(req, res) {
     try {
