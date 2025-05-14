@@ -1,13 +1,6 @@
 const Joi = require('joi');
 
 const validatePostMensaje = Joi.object({
-    cooperativa: Joi.string()
-        .hex()
-        .length(24)
-        .messages({
-            'string.hex': 'The ID must contain only hexadecimal characters.',
-            'string.length': 'The ID must be exactly 24 characters long.',
-        }),
     issue: Joi.string()
         .min(3)
         .max(50)

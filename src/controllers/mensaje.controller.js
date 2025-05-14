@@ -33,12 +33,14 @@ async function createMensaje(req, res) {
             message,
             issue,
         } = req.body;
-        const cooperativa = new mongoose.Types.ObjectId(req.body.cooperativa);
+        
+        const socio = await db.Socio.findById(req.user.id);
+        const cooperativa = await db.Cooperativa.findById(socio.cooperativa);
 
         const mensaje = await db.Mensaje.create({
             message,
             issue,
-            cooperativa,
+            cooperativa: cooperativa.id,
         });
         if (!mensaje) {
             return res.status(404).json({ error: 'Mensaje not created' });
