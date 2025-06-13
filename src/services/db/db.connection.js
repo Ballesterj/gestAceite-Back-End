@@ -4,8 +4,6 @@ let dbConnection = null;
 // Models
 require('../db/models/socio');
 require('../db/models/finca');
-require('../db/models/gasto');
-require('../db/models/ganancia');
 require('../db/models/cooperativa');
 require('../db/models/mensaje');
 
