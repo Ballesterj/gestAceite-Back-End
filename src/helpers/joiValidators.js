@@ -10,8 +10,7 @@ const JoiEntityId =
             'string.length': 'The ID must be exactly 24 characters long.',
             'any.required': 'The ID field is required.',
         });
-
-        
+       
 module.exports = {
     JoiEntityId,
 };

@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const { dataEncode } = require('../helpers/jwt.helper');
 require('dotenv').config({ path: `${__dirname}/env/.env` });
 
-
 async function login(req, res) {
     const { email, password } = req.body;
   
@@ -35,8 +34,6 @@ async function getMe(req, res) {
             return res.status(404).json({ message: 'Socio no encontrado' });
         }
 
-        
-        
         const socioResponse = socio.toObject();
         delete socioResponse.password;
         const cooperativa = await db.Cooperativa.findById(socio.cooperativa);
@@ -139,12 +136,12 @@ async function deleteSocio(req, res) {
         const socio = await db.Socio.findById(req.user.id);
 
         if (!socio) {
-            return res.status(404).json({ message: 'Socio no encontrado' });
+            return res.status(404).json({ message: 'Socio not found' });
         }
 
         await db.Socio.deleteOne({ _id: req.user.id });
 
-        res.status(200).json({ message: 'Socio eliminado' });
+        res.status(200).json({ message: 'Socio deleted' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -155,7 +152,7 @@ async function getSocios(req, res) {
         const socios = await db.Socio.find();
 
         if (!socios) {
-            return res.status(404).json({ message: 'No se encontraron socios' });
+            return res.status(404).json({ message: 'Socios not found' });
         }
 
         res.status(200).json(socios);
@@ -169,7 +166,7 @@ async function getReadsMessages(req, res) {
         const socio = await db.Socio.findById(req.user.id);
 
         if (!socio) {
-            return res.status(404).json({ message: 'Socio no encontrado' });
+            return res.status(404).json({ message: 'Socio not found' });
         }
 
         res.status(200).json({ mensajes_leidos: socio.mensajes_leidos });
@@ -183,7 +180,7 @@ async function putPresident(req, res) {
         const { id } = req.params;
         const socio = await db.Socio.findById(id);
         if (!socio) {
-            return res.status(404).json({ message: 'Socio no encontrado' });
+            return res.status(404).json({ message: 'Socio not found' });
         }
 
         const presidentExists = await db.Socio.findOne({ 
@@ -192,7 +189,7 @@ async function putPresident(req, res) {
         });
 
         if (presidentExists) {
-            return res.status(400).json({ message: 'Ya existe un presidente para esta cooperativa' });
+            return res.status(400).json({ message: 'There is already a president for this cooperative' });
         }
 
         socio.president = true;

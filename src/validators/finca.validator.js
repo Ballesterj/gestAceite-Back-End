@@ -71,7 +71,7 @@ const validatePostFinca = Joi.object({
     harvests: Joi.array()
       .items(
         Joi.object({
-          _id: Joi.string().optional(), // Permitimos que _id sea opcional
+          _id: Joi.string().optional(),
           year: Joi.number().integer().min(1900).max(new Date().getFullYear()).required().messages({
             'number.min': 'Year must be at least 1900.',
             'number.max': 'Year cannot be greater than the current year.',

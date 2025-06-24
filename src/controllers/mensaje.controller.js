@@ -19,7 +19,6 @@ async function getMensajes(req, res) {
         if (!socio) {
             return res.status(404).json({ message: 'Socio no encontrado' });
         }
-        // Buscar mensajes que correspondan a la cooperativa del socio
         const mensajes = await db.Mensaje.find({ cooperativa: socio.cooperativa });
         res.status(200).json(mensajes);
     } catch (error) {

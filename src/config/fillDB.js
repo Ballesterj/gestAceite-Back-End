@@ -40,7 +40,7 @@ const createData = async () => {
     const fincas = ['Vega', 'La Higuera', 'El Pinar', 'La Encina', 'El Olivar'];
     const ubication = ['Huesa', 'Linares'];
     for (const socio of socios) {
-      const numFincas = Math.floor(Math.random() * 4) + 2; // Entre 2 y 5 fincas
+      const numFincas = Math.floor(Math.random() * 4) + 2;
       for (let i = 1; i <= numFincas; i++) {
         await Finca.create({
           name: fincas[Math.floor(Math.random() * fincas.length)],

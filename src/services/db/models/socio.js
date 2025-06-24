@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-/**
- * User Schema
- */
-
 const SocioSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -23,6 +19,5 @@ const SocioSchema = new Schema({
   }],
   president: { type: Boolean, default: false },
 });
-
 
 module.exports = mongoose.model('Socio', SocioSchema);

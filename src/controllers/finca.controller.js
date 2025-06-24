@@ -59,7 +59,7 @@ async function createFinca(req, res) {
 async function updateFinca(req, res) {
     try {
       let { id } = req.params;
-      id = new ObjectId(id); // Asegurarnos de que el id sea de tipo ObjectId
+      id = new ObjectId(id);
       const finca = await db.Finca.findOne(id);
   
       if (!finca) {
@@ -73,10 +73,8 @@ async function updateFinca(req, res) {
         return res.status(403).json({ message: 'You are not authorized to update this finca' });
       }
   
-      // Extraemos los campos enviados en la solicitud
       const { name, location, surface, oliveAmount, owner, harvests } = req.body;
   
-      // Preparamos los campos a actualizar
       const updateFields = {
         name: name || finca.name,
         location: location || finca.location,
@@ -85,18 +83,15 @@ async function updateFinca(req, res) {
         owner: owner || finca.owner,
       };
   
-      // Si se han proporcionado cosechas en el cuerpo de la solicitud
       if (harvests) {
-        // Excluimos el campo _id de cada cosecha, ya que MongoDB lo gestiona automáticamente
         const updatedHarvests = harvests.map(harvest => {
-          const { _id, ...resto } = harvest; // Excluimos el _id
+          const { _id, ...resto } = harvest;
           return resto;
         });
   
-        updateFields.harvests = updatedHarvests; // Asignamos las cosechas actualizadas al objeto de actualización
+        updateFields.harvests = updatedHarvests;
       }
   
-      // Realizamos la actualización en la base de datos
       const updatedFinca = await db.Finca.findOneAndUpdate(
         id,
         updateFields,
@@ -107,7 +102,6 @@ async function updateFinca(req, res) {
         return res.status(400).json({ message: 'Error updating finca' });
       }
   
-      // Respondemos con la finca actualizada
       res.status(200).json(updatedFinca);
     } catch (err) {
       res.status(500).json({ message: err.message });

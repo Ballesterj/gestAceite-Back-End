@@ -19,7 +19,6 @@ async function getAceitePrecios(req, res) {
     const precioUrl = 'https://www.asajajaen.com/precio-del-aceite';
     const { data: precioData } = await axios.get(precioUrl);
     
-    // Aquí cambiamos el nombre de '$' a 'dom' o cualquier otro nombre
     const dom = cheerio.load(precioData); 
 
     const filas = [];
@@ -52,7 +51,6 @@ async function getAceitePrecios(req, res) {
   }
 }
 
-// Ruta para obtener las noticias sobre aceite
 async function getAceiteNoticias(req, res) {
   try {
     const noticiasUrl = 'https://www.asajajaen.com/category/actualidad/olivar';
@@ -66,7 +64,7 @@ async function getAceiteNoticias(req, res) {
         const enlace = `https://www.asajajaen.com${enlaceParcial}`;
         const descripcion = $(el).find('h2 a').text().trim();
         const imagen = $(el).find('img').attr('src') || null;
-        const titulo = descripcion; // si querés usar el mismo texto como título también
+        const titulo = descripcion;
 
         noticias.push({
           titulo,
@@ -82,8 +80,6 @@ async function getAceiteNoticias(req, res) {
     res.status(500).json({ error: 'Error al hacer scraping' });
   }
 }
-
-
 
 module.exports = {
     getMainPage,

@@ -12,7 +12,6 @@ const { auth } = require('../middlewares/auth');
 const { validateId } = require('../middlewares/validateId');
 const { validateNewCooperativa, validateUpdateCooperativa } = require('../middlewares/validateCooperativa');
 
-
 router.post('/', auth, validateNewCooperativa, createCooperativa);
 router.patch('/:id', auth, validateId, validateUpdateCooperativa, updateCooperativa);
 router.delete('/:id', auth, validateId, deleteCooperativa);

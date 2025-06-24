@@ -1,11 +1,9 @@
 const Joi = require('joi');
 const { JoiEntityId } = require('../helpers/joiValidators');
 
-
 const verifyId = Joi.object({
     id: JoiEntityId,
 });
-
 
 const validatePostSocio = Joi.object({
     name: Joi.string()

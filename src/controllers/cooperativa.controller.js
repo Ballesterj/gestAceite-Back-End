@@ -57,7 +57,6 @@ async function updateCooperativa(req, res) {
         if (!cooperativa) {
             return res.status(404).json({ error: 'Cooperativa not found' });
         }
-        //FALTA PRESIDENTE
         const {
             name,
             direction,
@@ -106,20 +105,6 @@ async function deleteCooperativa(req, res) {
     }
 }
 
-/**
- * @brief Retrieves socios (members) of a cooperativa (cooperative) by its ID.
- * 
- * This asynchronous function fetches socios associated with a specific cooperativa
- * from the database. If no socios are found, it returns a 404 status with an error message.
- * In case of any other errors, it returns a 500 status with the error message.
- * 
- * @param {Object} req - The request object.
- * @param {Object} req.params - The parameters of the request.
- * @param {string} req.params.id - The ID of the cooperativa.
- * @param {Object} res - The response object.
- * 
- * @returns {Promise<void>} A promise that resolves to void.
- */
 async function getSocios(req, res) {
     try {
         const socios = await db.Socio.find({ cooperativa: req.params.id });

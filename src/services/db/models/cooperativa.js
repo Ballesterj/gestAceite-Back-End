@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
 const CooperativaSchema = new Schema({
     name: { type: String, required: true },
     direction: { type: String, required: true },
